@@ -199,7 +199,7 @@ def apply_job(request, job_id):
     Application.objects.get_or_create(
         job_seeker=jobseeker,
         job=job,
-        defaults={"status": "pending"}
+        defaults={"status": "applied"}
     )
     messages.success(request, "Your application has been submitted!")
     return redirect("job_detail", job_id=job.id)
