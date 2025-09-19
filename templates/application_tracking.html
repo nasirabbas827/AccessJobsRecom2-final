@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">My Applications</h2>
+
+    {% if applications %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Job Title</th>
+                        <th scope="col">Company</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Applied On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'job_detail' app.job.id %}" class="fw-semibold text-decoration-none">
+                                    {{ app.job.title }}
+                                </a>
+                            </td>
+                            <td>{{ app.job.company_name }}</td>
+                            <td>
+                                {% if app.status == "pending" %}
+                                    <span class="badge bg-warning text-dark">{{ app.status|title }}</span>
+                                {% elif app.status == "accepted" %}
+                                    <span class="badge bg-success">{{ app.status|title }}</span>
+                                {% elif app.status == "rejected" %}
+                                    <span class="badge bg-danger">{{ app.status|title }}</span>
+                                {% else %}
+                                    <span class="badge bg-info">{{ app.status|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ app.applied_at|date:"M d, Y" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info mt-3">
+            You haven't applied to any jobs yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

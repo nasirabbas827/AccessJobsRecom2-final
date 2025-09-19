@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load template_filters %}
+{% block content %}
+<div class="d-flex" style="min-height: 100vh;">
+
+    <!-- Main Content -->
+    <div class="flex-grow-1" >
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="mb-5">
+                <h1 class="display-5 fw-bold text-dark mb-2">Welcome back, {{ jobseeker.full_name }}</h1>
+                <p class="text-muted lead">Explore AI-powered job recommendations tailored to your skills and experience</p>
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="card shadow-sm mb-5">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" name="keyword" class="form-control" placeholder="Search by keyword" value="{{ request.GET.keyword }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                <input type="text" name="location" class="form-control" placeholder="Location" value="{{ request.GET.location }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+    <select name="job_type" class="form-select">
+        <option value="">All Job Types</option>
+        <option value="full_time" {% if request.GET.job_type == "full_time" %}selected{% endif %}>Full Time</option>
+        <option value="part_time" {% if request.GET.job_type == "part_time" %}selected{% endif %}>Part Time</option>
+        <option value="remote" {% if request.GET.job_type == "remote" %}selected{% endif %}>Remote</option>
+        <option value="contract" {% if request.GET.job_type == "contract" %}selected{% endif %}>Contract</option>
+        <option value="internship" {% if request.GET.job_type == "internship" %}selected{% endif %}>Internship</option>
+    </select>
+</div>
+
+                        <div class="col-md-2">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                                <input type="text" name="salary" class="form-control" placeholder="Salary Range" value="{{ request.GET.salary }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Filter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Job Alerts & Notifications -->
+            <h2 class="h4 fw-bold text-dark mb-4">Job Alerts & Notifications</h2>
+            {% if recent_jobs %}
+                <div class="card shadow-sm mb-5">
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            {% for job in recent_jobs %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <a href="{% url 'job_detail' job.id %}" class="text-dark text-decoration-none fw-semibold">{{ job.title }}</a>
+                                        </h6>
+                                        <p class="text-muted mb-0">{{ job.company_name }} - {{ job.location }} <small>(Posted: {{ job.created_at|timesince }} ago)</small></p>
+                                    </div>
+                                    <span class="badge bg-info">{{ job.job_type|title }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info rounded-3">No new job postings in the last 7 days.</div>
+            {% endif %}
+
+            <!-- Recommended Jobs -->
+            <h2 class="h4 fw-bold text-dark mb-4">Your Personalized Job Recommendations</h2>
+            {% if recommended_jobs %}
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    {% for job in recommended_jobs %}
+                        <div class="col">
+                            <div class="card h-100 p-3 shadow-sm border-0" style="border-radius: 10px;">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title mb-2">
+                                        <a href="{% url 'job_detail' job.id %}" class="text-dark text-decoration-none fw-semibold">{{ job.title }}</a>
+                                    </h5>
+                                    <p class="text-muted mb-1">{{ job.company_name }} - {{ job.location }}</p>
+                                    <p><small class="text-muted">{{ job.created_at|date:"M d, Y" }}</small></p>
+                                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                                        <span class="badge bg-primary">{{ job.job_type|title }}</span>
+                                        <span class="badge bg-success">Match: {{ match_scores|lookup:job.id }}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info rounded-3">No personalized job recommendations available. Try updating your profile!</div>
+            {% endif %}
+
+            <!-- All Jobs -->
+            <h2 class="h4 fw-bold text-dark mb-4 mt-5">Explore All Jobs</h2>
+            {% if jobs %}
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    {% for job in jobs %}
+                        <div class="col">
+                            <div class="card h-100 p-3 shadow-sm border-0" style="border-radius: 10px;">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title mb-2">
+                                        <a href="{% url 'job_detail' job.id %}" class="text-dark text-decoration-none fw-semibold">{{ job.title }}</a>
+                                    </h5>
+                                    <p class="text-muted mb-1">{{ job.company_name }} - {{ job.location }}</p>
+                                    <p><small class="text-muted">{{ job.created_at|date:"M d, Y" }}</small></p>
+                                    <div class="mt-auto">
+                                        <span class="badge bg-secondary">{{ job.job_type|title }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info rounded-3">No jobs available at the moment.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
